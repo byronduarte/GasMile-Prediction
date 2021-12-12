@@ -1,98 +1,87 @@
-Auto1 <- read.table(file = "/Users/byronduarte/Desktop/ISYE7406-Data Mining and Statistical Learning/Auto.csv", sep = ",", header=T)
-head(Auto1)
-
-
+### Read the data
+Auto1 <- read.table(file = "Auto.csv", sep = ",", header=T)
+### Do the classification
 mpg01 = I(Auto1$mpg >= median(Auto1$mpg))
 Auto = data.frame(mpg01, Auto1[,-1]); ## replace column "mpg" by "mpg01".
 
-dim(Auto1)
-summary(Auto1)
-
-library(ggplot2)
-library(gridExtra)
-install.packages("gridExtra")
-library(gridExtra)
-library(car)
-
 ### Graphical analysis
-scat_cylinders <- ggplot(Auto1, aes(y = mpg, x = cylinders)) + geom_point() 
-scat_displacement <- ggplot(Auto1, aes(y = mpg, x = displacement)) + geom_point() 
-scat_horsepower <- ggplot(Auto1, aes(y = mpg, x = horsepower)) + geom_point() 
-scat_weight <- ggplot(Auto1, aes(y = mpg, x = weight)) + geom_point() 
-scat_acceleration <- ggplot(Auto1, aes(y = mpg, x = acceleration)) + geom_point() 
-scat_year <- ggplot(Auto1, aes(y = mpg, x = year)) + geom_point()
+## scatter plot
+scat_cylinders <- ggplot(Auto1, aes(y = mpg, x = cylinders)) + geom_point() scat_displacement <- ggplot(Auto1, aes(y = mpg, x = displacement)) + geom_point() scat_horsepower <- ggplot(Auto1, aes(y = mpg, x = horsepower)) + geom_point() scat_weight <- ggplot(Auto1, aes(y = mpg, x = weight)) + geom_point() scat_acceleration <- ggplot(Auto1, aes(y = mpg, x = acceleration)) + geom_point() scat_year <- ggplot(Auto1, aes(y = mpg, x = year)) + geom_point()
 scat_origin <- ggplot(Auto1, aes(y = mpg, x = origin)) + geom_point()
+#install.packages(’gridExtra’)
+library(gridExtra)
+grid.arrange(scat_cylinders, scat_displacement, scat_horsepower, scat_weight,
+scat_acceleration, scat_year, scat_origin, ncol=2)
+# grid.arrange(scat_cylinders, scat_displacement, scat_horsepower, scat_weight, ncol=4) # grid.arrange(scat_acceleration, scat_year, scat_origin, ncol=3)
 
-grid.arrange(scat_cylinders, scat_displacement, scat_horsepower, scat_weight, scat_acceleration, ncol=5) 
-grid.arrange(scat_cylinders, scat_displacement, scat_horsepower, scat_weight, ncol=4) 
-grid.arrange(scat_acceleration, scat_year, scat_origin, ncol=3)
+## box plot
+box_cylinders <- ggplot(Auto1, aes(y = cylinders, x = mpg01)) + geom_boxplot() box_displacement <- ggplot(Auto1, aes(y = displacement,x = mpg01)) + geom_boxplot() box_horsepower <- ggplot(Auto1, aes(y= horsepower,x = mpg01)) + geom_boxplot() box_weight <- ggplot(Auto1, aes(y= weight, x = mpg01)) + geom_boxplot() box_acceleration <- ggplot(Auto1, aes(y=acceleration, x = mpg01)) + geom_boxplot() box_year <- ggplot(Auto1, aes(y = year, x = mpg01)) + geom_boxplot()
+box_origin <- ggplot(Auto1, aes(y = origin, x = mpg01)) + geom_boxplot()
+grid.arrange(box_cylinders, box_displacement, box_horsepower, box_weight, box_acceleration, box_year, box_origin, ncol=2)
+# grid.arrange(box_cylinders, box_displacement, box_horsepower, box_weight, ncol=4) # grid.arrange(box_acceleration, box_year, box_origin, ncol=3)
 
-#The corrlation table
-round(cor(Auto),2)  
+The corrlation table
+round(cor(Auto),2)
+### scatter plot matrix
+pairs(Auto, pch = 10)
 
-boxplot(Auto1)
-
-scatterplotMatrix(Auto1) 
-cor(Auto1)
-attach(Auto1)
+# A more fancy scatter plot matrix library(psych)
+pairs.panels(Auto,
+method = "pearson", # correlation method hist.col = "#00AFBB",
+density = TRUE, # show density plots ellipses = TRUE # show correlation ellipses
+)
 
 ###cylinders, displacement, horsepower, weight, and origin are the most important variables
 Auto2 = Auto[,c(1:5,8)]
 
+
 ### Split the data to train and test
 n = dim(Auto2)[1] ### total number of observations
-n1 = round(n/10) ### number of observations randomly selected for testing data 
-set.seed(19930419); ### set the random seed
+n1 = round(n/10) ### number of observations randomly selected for testing data set.seed(19930419); ### set the random seed
 flag = sort(sample(1:n, n1))
+
 Auto2train = Auto2[-flag,]
 Auto2test = Auto2[flag,]
 Auto2train$mpg01 <- as.factor(Auto2train$mpg01);
 
+
 ###LDA
 library(MASS)
 fit1 <- lda(Auto2train[,2:6], Auto2train[,1]) ##
-pred1 <- predict(fit1,Auto2train[,2:6])$class 
-mean( pred1 != Auto2train$mpg01)
+pred1 <- predict(fit1,Auto2train[,2:6])$class mean( pred1 != Auto2train$mpg01)
 ## 0.09348442 for miss.class.train.error
 mean( predict(fit1,Auto2test[,2:6])$class != Auto2test$mpg01) 
 ## 0.1538462 for miss.class.test.error
-plot(pred1)
-plot(fit1)
+
 
 ## QDA
-fit2 <- qda(Auto2train[,2:6], Auto2train[,1]) ##
-pred2 <- predict(fit2,Auto2train[,2:6])$class 
-mean( pred2!= Auto2train$mpg01)
-
+fit2 <- qda(Auto2train[,2:6], Auto2train[,1]) 
+##
+pred2 <- predict(fit2,Auto2train[,2:6])$class mean( pred2!= Auto2train$mpg01)
+## 0.09065156 for miss.class.train.error
 mean( predict(fit2,Auto2test[,2:6])$class != Auto2test$mpg01) 
+## 0.2051282 for miss.class.test.error
 
-plot(pred2)
-plot(fit2)
-boxplot(pred2)
-scatterplot(fit2)
-summary(pred2)
-summary(fit2)
 
-## Naive Bayes
-install.packages("e1071")
 library(e1071)
 fit3 <- naiveBayes(Auto2train[,2:6], Auto2train[,1]) 
 pred3 <- predict(fit3, Auto2train[,2:6]);
 mean( pred3 != Auto2train$mpg01)
+## 0.09348442 for miss.class.train.error
 
 mean( predict(fit3,Auto2test[,2:6]) != Auto2test$mpg01) 
+## 0.2051282 for miss.class.test.error
 
 
-plot(fit3)
-plot(pred3)
-
+# logistic
 library(nnet)
 fit4 <- multinom( mpg01 ~ cylinders + displacement + horsepower + weight + origin, data=Auto2train)
 summary(fit4);
 pred4<- predict(fit4, Auto2train[,2:6])
 mean( pred4 != Auto2train$mpg01)
 ## 0.09065156 for miss.class.train.error
-mean(predict(fit4,Auto2test[,2:6]) != Auto2test$mpg01) 
+mean(predict(fit4,Auto2test[,2:6]) != Auto2test$mpg01)
+
 ## 0.1794872 for miss.class.test.error
 
 # KNN
@@ -102,18 +91,75 @@ tetest=c(1:10)
 for (i in 1:10){
 pred5 <- knn(train = Auto2train[,2:6], test = Auto2train[,2:6], cl = Auto2train[,1], k=i) 
 tetrain[i]<-round(mean( pred5 != Auto2train[,1]),3)
-#tetrain for k=1:10
-## 0.000 0.074 0.074 0.074 0.082 0.085 0.088 0.093 0.091 0.093 
-tetest[i]<-round(mean( knn(train = Auto2train[,2:6], test = Auto2test[,2:6], cl = Auto2train[,1], k=i) != Auto2test[,1]),3)
+
+##tetrain for k=1:10
+## 0.000 0.074 0.074 0.074 0.082 0.085 0.088 0.093 0.091 0.093 tetest[i]<-round(mean( knn(train = Auto2train[,2:6], test = Auto2test[,2:6], cl = Auto2train[,1], k=i) != Auto2test[,1]),3)
 ##tetest for k=1:10
 ## 0.205 0.179 0.154 0.154 0.179 0.205 0.179 0.179 0.179 0.205
 }
 tetrain
 tetest
 
-plot(tetrain)
-plot(tetest)
-scatterplot(tetest)
+### Average preformance
+B= 100; ### number of loops
+TrainErrALL = NULL
+TestErrALL = NULL ### Final TE values
 
-summary(tetrain)
-summary(tetest)
+n = dim(Auto2)[1] ### total number of observations
+n1 = round(n/10) ### number of observations randomly selected for testing data
+
+for (b in 1:B){
+flag = sort(sample(1:n, n1))
+Auto2train = Auto[-flag,]
+Auto2test = Auto[flag,]
+Auto2train$mpg01 <- as.factor(Auto2train$mpg01);
+#(i) LDA
+fit1 <- lda(Auto2train[,2:6], Auto2train[,1])
+pred1 <- predict(fit1,Auto2train[,2:6])$class
+trainerr1 <- mean( pred1 != Auto2train$mpg01)
+testerr1 <- mean( predict(fit1,Auto2test[,2:6])$class != Auto2test$mpg01)
+#(ii) QDA
+fit2 <- qda(Auto2train[,2:6], Auto2train[,1]) pred2 <- predict(fit2,Auto2train[,2:6])$class
+
+rainerr2 <- mean( pred2!= Auto2train$mpg01)
+testerr2 <- mean( predict(fit2,Auto2test[,2:6])$class != Auto2test$mpg01)
+
+#(iii) Naive Bayes
+fit3 <- naiveBayes(Auto2train[,2:6], Auto2train[,1])
+pred3 <- predict(fit3, Auto2train[,2:6]);
+trainerr3 <- mean( pred3 != Auto2train$mpg01)
+testerr3 <- mean( predict(fit3,Auto2test[,2:6]) != Auto2test$mpg01)
+
+#(iv) Logisic Regression
+fit4 <- multinom( mpg01 ~ cylinders + displacement +
+horsepower + weight, data=Auto2train)
+summary(fit4);
+pred4<- predict(fit4, Auto2train[,2:6])
+trainerr4 <- mean( pred4 != Auto2train$mpg01)
+testerr4 <- mean(predict(fit4,Auto2test[,2:6]) != Auto2test$mpg01)
+
+(v) KNN
+pred5 <- knn(train = Auto2train[,2:6], test = Auto2train[,2:6],
+cl = Auto2train[,1], k=3)
+trainerr5 <- mean( pred5 != Auto2train[,1])
+testerr5 <- mean( knn(train = Auto2train[,2:6], test = Auto2test[,2:6], cl = Auto2train[,1], k=3) != Auto2test[,1])
+  TrainErrALL = rbind( TrainErrALL,
+  cbind(trainerr1, trainerr2, trainerr3, trainerr4, trainerr5) );
+  TestErrALL = rbind( TestErrALL,
+  cbind(testerr1, testerr2, testerr3, testerr4, testerr5) );
+}
+
+dim(TrainErrALL) ### This should be a Bx7 matrices
+dim(TestErrALL)
+colnames(TrainErrALL) <- c("mod1", "mod2", "mod3", "mod4", "mod5"); colnames(TestErrALL) <- c("mod1", "mod2", "mod3", "mod4", "mod5");
+## You can report the sample mean and sample variances for the five models round(apply(TrainErrALL, 2, mean),4)
+round(sqrt(apply(TrainErrALL, 2, var)),4)
+round(apply(TestErrALL, 2, mean),4)
+round(sqrt(apply(TestErrALL, 2, var)),4)
+
+
+## compare QDA with others
+t.test(TestErrALL[,1], TestErrALL[,2],paired=TRUE) #p 1.003e-06
+t.test(TestErrALL[,3], TestErrALL[,2],paired=TRUE) # p 0.0005635
+t.test(TestErrALL[,4], TestErrALL[,2],paired=TRUE) # p 4.927e-07
+t.test(TestErrALL[,5], TestErrALL[,2],paired=TRUE) # p 1.817e-06
