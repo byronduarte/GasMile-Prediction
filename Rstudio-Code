@@ -6,7 +6,10 @@ Auto = data.frame(mpg01, Auto1[,-1]); ## replace column "mpg" by "mpg01".
 
 ### Graphical analysis
 ## scatter plot
-scat_cylinders <- ggplot(Auto1, aes(y = mpg, x = cylinders)) + geom_point() scat_displacement <- ggplot(Auto1, aes(y = mpg, x = displacement)) + geom_point() scat_horsepower <- ggplot(Auto1, aes(y = mpg, x = horsepower)) + geom_point() scat_weight <- ggplot(Auto1, aes(y = mpg, x = weight)) + geom_point() scat_acceleration <- ggplot(Auto1, aes(y = mpg, x = acceleration)) + geom_point() scat_year <- ggplot(Auto1, aes(y = mpg, x = year)) + geom_point()
+scat_cylinders <- ggplot(Auto1, aes(y = mpg, x = cylinders)) + geom_point() 
+scat_displacement <- ggplot(Auto1, aes(y = mpg, x = displacement)) + geom_point() 
+scat_horsepower <- ggplot(Auto1, aes(y = mpg, x = horsepower)) + geom_point() scat_weight <- ggplot(Auto1, aes(y = mpg, x = weight)) + geom_point() 
+scat_acceleration <- ggplot(Auto1, aes(y = mpg, x = acceleration)) + geom_point() scat_year <- ggplot(Auto1, aes(y = mpg, x = year)) + geom_point()
 scat_origin <- ggplot(Auto1, aes(y = mpg, x = origin)) + geom_point()
 #install.packages(’gridExtra’)
 library(gridExtra)
@@ -15,7 +18,12 @@ scat_acceleration, scat_year, scat_origin, ncol=2)
 # grid.arrange(scat_cylinders, scat_displacement, scat_horsepower, scat_weight, ncol=4) # grid.arrange(scat_acceleration, scat_year, scat_origin, ncol=3)
 
 ## box plot
-box_cylinders <- ggplot(Auto1, aes(y = cylinders, x = mpg01)) + geom_boxplot() box_displacement <- ggplot(Auto1, aes(y = displacement,x = mpg01)) + geom_boxplot() box_horsepower <- ggplot(Auto1, aes(y= horsepower,x = mpg01)) + geom_boxplot() box_weight <- ggplot(Auto1, aes(y= weight, x = mpg01)) + geom_boxplot() box_acceleration <- ggplot(Auto1, aes(y=acceleration, x = mpg01)) + geom_boxplot() box_year <- ggplot(Auto1, aes(y = year, x = mpg01)) + geom_boxplot()
+box_cylinders <- ggplot(Auto1, aes(y = cylinders, x = mpg01)) + geom_boxplot() 
+box_displacement <- ggplot(Auto1, aes(y = displacement,x = mpg01)) + geom_boxplot() 
+box_horsepower <- ggplot(Auto1, aes(y= horsepower,x = mpg01)) + geom_boxplot() 
+box_weight <- ggplot(Auto1, aes(y= weight, x = mpg01)) + geom_boxplot() 
+box_acceleration <- ggplot(Auto1, aes(y=acceleration, x = mpg01)) + geom_boxplot() 
+box_year <- ggplot(Auto1, aes(y = year, x = mpg01)) + geom_boxplot()
 box_origin <- ggplot(Auto1, aes(y = origin, x = mpg01)) + geom_boxplot()
 grid.arrange(box_cylinders, box_displacement, box_horsepower, box_weight, box_acceleration, box_year, box_origin, ncol=2)
 # grid.arrange(box_cylinders, box_displacement, box_horsepower, box_weight, ncol=4) # grid.arrange(box_acceleration, box_year, box_origin, ncol=3)
